@@ -44,19 +44,21 @@ pairIsNonDecreasing a b = a <= b
 data Answer = Answer { truth :: Bool, permutation :: Maybe [Integer] }
     deriving Show
 
+bounds' list = (1, (fromIntegral . length) list)
+range' list = [ (fst . bounds') list .. (snd . bounds') list ]
+
 fNaive :: [Integer] -> Answer
 fNaive list
     | length list < 3 = Answer { truth = True, permutation = Nothing }
     | length answers > 0 = head answers
     | otherwise = Answer { truth = False, permutation = Nothing }
     where
-        range = [0 .. (fromIntegral . length) list - 1]
         answers = (filter truth) $
             [ Answer
                 { truth = listIsNonDecreasing (swapInList x y list)
                 , permutation = if x == y then Nothing else Just [x, y]
                 }
-            | x <- range, y <- range
+            | x <- range' list, y <- range' list
             ]
 
 swapInList :: Integer -> Integer -> [a] -> [a]
@@ -64,7 +66,7 @@ swapInList a b list
     | a == b = list
     | otherwise =
         let
-            m = listArray (0, (fromIntegral . length) list - 1) list
+            m = listArray (bounds' list) list
             a' = fromIntegral a :: Int
             b' = fromIntegral b :: Int
             storeSwap = m ! a'

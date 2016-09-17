@@ -15,7 +15,7 @@ testCases
         , listIsNonDecreasing [1,2,1] == False
         , listIsNonDecreasing [1,2,1,2] == False
         ]
-    ++  [ swapInList 1 3 [0,1,2,3,4] == [0,3,2,1,4]
+    ++  [ swapInList 2 4 [1,2,3,4,5] == [1,4,3,2,5]
         ]
     ++  [ truth (fNaive [1,3,2,4]) == True
         ]
