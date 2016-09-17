@@ -19,27 +19,29 @@ f1 :: [Integer] -> Bool
 f1 (a:b:xs) = undefined
 f1 list = True
 
--- whereDoesListFall :: [Integer] -> [Integer]
--- whereDoesListFall xs
+type W = WriterT [Integer] (StateT Integer Identity) Integer
+
+-- locateDisorders :: [Integer] -> [Integer]
+-- locateDisorders xs
 --     | length xs < 2 = []
---     | otherwise = snd . runWriter $ foldM1 f xs
+--     | otherwise = snd . runWriter $ foldl' f (return . return (head xs)) (tail xs)
 --     where
---     f :: Integer -> Integer -> WriterT [Integer] (StateT Integer Identity) Integer
+--     f :: W -> Integer -> W
 --     f a b
---         | pairIsNonDecreasing a b = return b
+--         | a `ord` b = return b
 --         | otherwise = tell [position] >> return b
 --     position = 13
 
-listIsNonDecreasing :: [Integer] -> Bool
-listIsNonDecreasing [] = True
-listIsNonDecreasing [a] = True
-listIsNonDecreasing [a,b] = pairIsNonDecreasing a b
-listIsNonDecreasing (a:b:xs)
-    | pairIsNonDecreasing a b = listIsNonDecreasing (b:xs)
+isOrdered :: [Integer] -> Bool
+isOrdered [] = True
+isOrdered [a] = True
+isOrdered [a,b] = ord a b
+isOrdered (a:b:xs)
+    | a `ord` b = isOrdered (b:xs)
     | otherwise = False
 
-pairIsNonDecreasing :: Integer -> Integer -> Bool
-pairIsNonDecreasing a b = a <= b
+ord :: Integer -> Integer -> Bool
+ord a b = a <= b
 
 data Answer = Answer { truth :: Bool, permutation :: Maybe [Integer] }
     deriving Show
@@ -55,7 +57,7 @@ fNaive list
     where
         answers = (filter truth) $
             [ Answer
-                { truth = listIsNonDecreasing (swapInList x y list)
+                { truth = isOrdered (swapInList x y list)
                 , permutation = if x == y then Nothing else Just [x, y]
                 }
             | x <- range' list, y <- range' list
